@@ -1,0 +1,9 @@
+# Normalise line endings for all text files
+* text=auto
+
+# Treat JavaScript as text (avoid binary diff on CRLF mangling)
+*.js text eol=lf
+*.ts text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.md text eol=lf

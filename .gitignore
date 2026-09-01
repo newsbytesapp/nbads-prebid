@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Cloudflare / Wrangler
+.wrangler/
+.d1/
+*.tsbuildinfo
+
+# Environment / secrets (never commit)
+.dev.vars
+.env
+.env.*
+!.env.example
+
+# Build output (not used for a plain worker, but excluded just in case)
+dist/
+build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

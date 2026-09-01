@@ -1,0 +1,31 @@
+{
+  "name": "nbads-prebid",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cloudflare Worker that downloads, caches, and serves a custom prebid.js build at /nbads/prebid.js",
+  "license": "MIT",
+  "keywords": [
+    "prebid",
+    "prebid.js",
+    "cloudflare",
+    "workers",
+    "header-bidding"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "typecheck": "tsc --noEmit",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "test": "node --test \"tests/**/*.test.js\""
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "5.20260901.1",
+    "typescript": "7.0.2",
+    "wrangler": "4.127.1"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "workerd@1.20260828.1": true
+  }
+}
