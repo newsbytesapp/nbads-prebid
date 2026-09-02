@@ -5,7 +5,7 @@ custom [prebid.js](https://docs.prebid.org/download.html) build from Prebid's of
 build service, caches it at the edge, and serves it at a single, stable URL:
 
 ```
-GET /nbads/prebid.js?v=11.23.0
+GET /nb/template/prebid.js?v=11.23.0
 ```
 
 It replaces the Laravel `prebid:download` command + `public/js/prebid.js` static file
@@ -17,7 +17,7 @@ approach with a fully dynamic, CDN-served asset that never requires a rebuild st
 
 ```
 Client
-  │  GET /nbads/prebid.js?v=11.23.0
+  │  GET /nb/template/prebid.js?v=11.23.0
   ▼
 Cloudflare CDN ──(cached, Cache-Control: public)──► served instantly
   │  (miss / expired)
@@ -120,10 +120,10 @@ purge the cache so a stale build is not served (see [Cache purge](#cache-purge))
 
 | Method | Path                | Behavior                                                        |
 | ------ | ------------------- | --------------------------------------------------------------- |
-| GET    | `/nbads/prebid.js`  | Returns the prebid.js bundle for the resolved version.           |
-| HEAD   | `/nbads/prebid.js`  | Same headers as GET (no body) — free via normal fetch semantics. |
+| GET    | `/nb/template/prebid.js`  | Returns the prebid.js bundle for the resolved version.           |
+| HEAD   | `/nb/template/prebid.js`  | Same headers as GET (no body) — free via normal fetch semantics. |
 | other  | any other path      | `404 Not found`.                                                 |
-| POST   | `/nbads/prebid.js`  | `405 Method not allowed`.                                        |
+| POST   | `/nb/template/prebid.js`  | `405 Method not allowed`.                                        |
 
 ### Version resolution
 
@@ -161,7 +161,7 @@ npm install-scripts approve esbuild workerd
 
 # 2. Run locally
 npm run dev
-# -> http://localhost:8787/nbads/prebid.js?v=11.23.0
+# -> http://localhost:8787/nb/template/prebid.js?v=11.23.0
 
 # 3. Type-check the worker
 npm run typecheck
@@ -177,7 +177,7 @@ npm run deploy
 
 By default the Worker is available at `<your-worker-name>.workers.dev`. To mount it
 under a path on your own domain, add a **route** in the Cloudflare dashboard:
-`<yourdomain.com>/nbads/prebid.js*` → `nbads-prebid`.
+`<yourdomain.com>/nb/template/prebid.js*` → `nbads-prebid`.
 
 ### Deploying to a custom zone via wrangler
 
@@ -194,13 +194,13 @@ routes = [
 
 ```bash
 # Check headers (Hit vs Miss / version)
-curl -sI 'https://<your-host>/nbads/prebid.js?v=11.23.0'
+curl -sI 'https://<your-host>/nb/template/prebid.js?v=11.23.0'
 
 # Verify the body is valid JS
-curl -s 'https://<your-host>/nbads/prebid.js?v=11.23.0' | grep -c 'window.pbjs' || true
+curl -s 'https://<your-host>/nb/template/prebid.js?v=11.23.0' | grep -c 'window.pbjs' || true
 
 # Confirm the edge-cache state
-curl -sI 'https://<your-host>/nbads/prebid.js?v=11.23.0' | grep -i cf-cache-status
+curl -sI 'https://<your-host>/nb/template/prebid.js?v=11.23.0' | grep -i cf-cache-status
 ```
 
 - `CF-Cache-Status: HIT` → served from the CDN.
@@ -214,7 +214,7 @@ If you change the module list or upgrade the version, purge the old bundle so cl
 don't receive a stale build.
 
 **Via the Cloudflare dashboard** (recommended): Cloudflare → Caching → Purge → purge the
-URL `https://<your-host>/nbads/prebid.js?v=<old-version>`.
+URL `https://<your-host>/nb/template/prebid.js?v=<old-version>`.
 
 **Via API** (requires an API token with cache-purge permission):
 
@@ -222,7 +222,7 @@ URL `https://<your-host>/nbads/prebid.js?v=<old-version>`.
 curl -X POST 'https://api.cloudflare.com/client/v4/zones/<ZONE_ID>/purge_cache' \
   -H "Authorization: Bearer <API_TOKEN>" \
   -H "Content-Type: application/json" \
-  --data '{"files":["https://<your-host>/nbads/prebid.js?v=11.23.0"]}'
+  --data '{"files":["https://<your-host>/nb/template/prebid.js?v=11.23.0"]}'
 ```
 
 ---
@@ -262,7 +262,7 @@ file for local `wrangler dev`. See [`.env.example`](.env.example) for a document
 | `PREBID_BUILD_ENDPOINT`    | Override the Prebid build service URL.       | `https://js-download.prebid.org/download` |
 | `PREBID_DEFAULT_VERSION`   | Override the default version.                | `11.23.0`                            |
 | `PREBID_ALLOWED_VERSIONS`  | Comma-separated version whitelist.           | `11.23.0`                            |
-| `PREBID_ROUTE_PATH`        | Override the served path.                    | `/nbads/prebid.js`                   |
+| `PREBID_ROUTE_PATH`        | Override the served path.                    | `/nb/template/prebid.js`                   |
 | `PREBID_BIDDERS`           | Comma-separated bidder adapter modules.      | `magniteBidAdapter,msftBidAdapter,...` |
 | `PREBID_STANDARD_MODULES`  | Comma-separated always-included modules.     | `consentManagementTcf,gppControl...` |
 | `PREBID_CACHE_CONTROL`     | Client-facing `Cache-Control`.               | `max-age=604800, public, s-maxage=86400` |

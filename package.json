@@ -2,7 +2,7 @@
   "name": "nbads-prebid",
   "version": "1.0.0",
   "private": true,
-  "description": "Cloudflare Worker that downloads, caches, and serves a custom prebid.js build at /nbads/prebid.js",
+  "description": "Cloudflare Worker that downloads, caches, and serves a custom prebid.js build at /nb/template/prebid.js",
   "license": "MIT",
   "keywords": [
     "prebid",

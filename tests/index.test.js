@@ -32,11 +32,12 @@ test('serves a valid build on cache miss and caches both tiers', async () => {
   const fetchMock = mockFetch(() => upstreamResponse());
   const ctx = makeCtx();
 
-  const resp = await worker.fetch(makeRequest('/nbads/prebid.js', { v: '11.23.0' }), {}, ctx);
+  const resp = await worker.fetch(makeRequest('/nb/template/prebid.js', { v: '11.23.0' }), {}, ctx);
 
   assert.equal(resp.status, 200);
   assert.equal(resp.headers.get('Content-Type'), 'application/javascript; charset=utf-8');
   assert.equal(resp.headers.get('Cache-Control'), 'max-age=604800, public, s-maxage=86400');
+  assert.equal(resp.headers.get('Access-Control-Allow-Origin'), '*');
   assert.equal(resp.headers.get('X-Prebid-Version'), '11.23.0');
   assert.equal(await resp.text(), validBody());
 
@@ -50,7 +51,7 @@ test('serves a valid build on cache miss and caches both tiers', async () => {
 
 test('serves from the primary cache without re-fetching', async () => {
   const cache = mockCaches();
-  const request = makeRequest('/nbads/prebid.js', { v: '11.23.0' });
+  const request = makeRequest('/nb/template/prebid.js', { v: '11.23.0' });
   cache.store.set(
     cacheKeyUrl(request, '11.23.0', 'primary'),
     new Response(validBody(), { status: 200 })
@@ -77,7 +78,7 @@ test('retries a transient network failure and then succeeds', async () => {
   });
 
   const resp = await worker.fetch(
-    makeRequest('/nbads/prebid.js', { v: '11.23.0' }),
+    makeRequest('/nb/template/prebid.js', { v: '11.23.0' }),
     FAST_RETRY_ENV,
     makeCtx()
   );
@@ -88,7 +89,7 @@ test('retries a transient network failure and then succeeds', async () => {
 
 test('retry-exhausted with cached fallback serves the last-known-good build', async () => {
   const cache = mockCaches();
-  const request = makeRequest('/nbads/prebid.js', { v: '11.23.0' });
+  const request = makeRequest('/nb/template/prebid.js', { v: '11.23.0' });
   // Seed only the long-lived fallback tier (as if a prior good build existed).
   cache.store.set(
     cacheKeyUrl(request, '11.23.0', 'fallback'),
@@ -110,7 +111,7 @@ test('retry-exhausted with no cache returns 502 and never caches a failure', asy
   const fetchMock = mockFetch(() => Promise.reject(new Error('unreachable')));
 
   const resp = await worker.fetch(
-    makeRequest('/nbads/prebid.js', { v: '11.23.0' }),
+    makeRequest('/nb/template/prebid.js', { v: '11.23.0' }),
     NO_RETRY_ENV,
     makeCtx()
   );
@@ -127,7 +128,7 @@ test('rejects an invalid (non-JS / tiny) bundle and never caches it', async () =
   );
 
   const resp = await worker.fetch(
-    makeRequest('/nbads/prebid.js', { v: '11.23.0' }),
+    makeRequest('/nb/template/prebid.js', { v: '11.23.0' }),
     NO_RETRY_ENV,
     makeCtx()
   );
@@ -142,7 +143,7 @@ test('returns 502 on a non-2xx upstream response', async () => {
   const fetchMock = mockFetch(() => new Response('boom', { status: 503 }));
 
   const resp = await worker.fetch(
-    makeRequest('/nbads/prebid.js', { v: '11.23.0' }),
+    makeRequest('/nb/template/prebid.js', { v: '11.23.0' }),
     NO_RETRY_ENV,
     makeCtx()
   );
@@ -158,7 +159,7 @@ test('route guard returns 404 for a different path', async () => {
 
 test('method guard returns 405 for non-GET/HEAD', async () => {
   const resp = await worker.fetch(
-    makeRequest('/nbads/prebid.js', {}, { method: 'POST' }),
+    makeRequest('/nb/template/prebid.js', {}, { method: 'POST' }),
     {},
     makeCtx()
   );
@@ -177,7 +178,7 @@ test('version resolution: whitelisted, unknown, and missing `v`', async () => {
     const fetchMock = mockFetch(() => upstreamResponse());
 
     const params = v ? { v } : {};
-    const resp = await worker.fetch(makeRequest('/nbads/prebid.js', params), {}, makeCtx());
+    const resp = await worker.fetch(makeRequest('/nb/template/prebid.js', params), {}, makeCtx());
 
     assert.equal(resp.headers.get('X-Prebid-Version'), expected);
     // The resolved version was sent to the build service body.
@@ -191,7 +192,7 @@ test('sends the configured module list to the build service', async () => {
   mockCaches();
   const fetchMock = mockFetch(() => upstreamResponse());
 
-  await worker.fetch(makeRequest('/nbads/prebid.js', { v: '11.23.0' }), {}, makeCtx());
+  await worker.fetch(makeRequest('/nb/template/prebid.js', { v: '11.23.0' }), {}, makeCtx());
 
   const [, init] = fetchMock.calls[0];
   const body = String(init.body);
@@ -207,7 +208,7 @@ test('Cache-Control override from env is applied to client responses', async () 
   mockFetch(() => upstreamResponse());
 
   const resp = await worker.fetch(
-    makeRequest('/nbads/prebid.js', { v: '11.23.0' }),
+    makeRequest('/nb/template/prebid.js', { v: '11.23.0' }),
     { PREBID_CACHE_CONTROL: 'max-age=900, public' },
     makeCtx()
   );
@@ -220,7 +221,7 @@ test('fallback cache entry uses the fallback Cache-Control via env', async () =>
   mockFetch(() => upstreamResponse());
 
   await worker.fetch(
-    makeRequest('/nbads/prebid.js', { v: '11.23.0' }),
+    makeRequest('/nb/template/prebid.js', { v: '11.23.0' }),
     { PREBID_FALLBACK_CACHE_CONTROL: 'max-age=7777, public' },
     makeCtx()
   );

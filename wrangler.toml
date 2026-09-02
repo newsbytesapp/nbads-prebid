@@ -3,7 +3,7 @@ name = "nbads-prebid"
 main = "src/index.js"
 compatibility_date = "2026-09-01"
 
-# Enable Cloudflare's built-in caching layer so that the GET /nbads/prebid.js
+# Enable Cloudflare's built-in caching layer so that the GET /nb/template/prebid.js
 # response (which carries Cache-Control: public) is cached at the edge.
 [cache]
 enabled = true

@@ -14,7 +14,7 @@ const HAD_CACHES = Object.prototype.hasOwnProperty.call(globalThis, 'caches');
 const ORIGINAL_CACHES = globalThis.caches;
 
 /** The path the Worker serves by default. @type {string} */
-export const ROUTE_PATH = '/nbads/prebid.js';
+export const ROUTE_PATH = '/nb/template/prebid.js';
 
 /** A valid `Content-Type` for an upstream prebid.js bundle. @type {string} */
 export const VALID_JS_CT = 'application/javascript; charset=UTF-8';

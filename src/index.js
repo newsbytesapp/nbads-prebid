@@ -1,7 +1,7 @@
 /**
  * @fileoverview
  * Cloudflare Worker that downloads, caches at the edge, and serves a custom
- * `prebid.js` bundle at the `GET /nbads/prebid.js` endpoint.
+ * `prebid.js` bundle at the `GET /nb/template/prebid.js` endpoint.
  *
  * The bundle is produced by Prebid's official build service (`js-download.prebid.org`).
  * This Worker wraps that service so clients get a stable, aggressively cached asset on a
@@ -174,6 +174,8 @@ function makeResponse(js, version, cacheControl) {
       'Content-Type': 'application/javascript; charset=utf-8',
       'Cache-Control': cacheControl,
       'X-Prebid-Version': version,
+      // Allow any origin to fetch the script (e.g. from a cross-domain site).
+      'Access-Control-Allow-Origin': '*',
     },
   });
 }

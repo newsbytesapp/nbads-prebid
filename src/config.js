@@ -33,7 +33,7 @@
  */
 export const DEFAULT_CONFIG = {
   /** The single path this Worker serves. */
-  routePath: '/nbads/prebid.js',
+  routePath: '/nb/template/prebid.js',
 
   /** Prebid's offline build/download service. */
   buildEndpoint: 'https://js-download.prebid.org/download',
